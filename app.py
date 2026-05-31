@@ -11,7 +11,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # --- FIXED API INITIALIZATION ---
 # The new SDK automatically looks for an environment variable named GEMINI_API_KEY.
 # If you must hardcode it temporarily, replace os.environ.get(...) with "AIzaSyYourNewKeyHere"
-API_KEY = os.environ.get("GEMINI_API_KEY","AQ.Ab8RN6IKHxGY16C3UUzV-sd8L_Mwtvne6irPVdzLpYLtmbIntg")
+API_KEY = os.environ.get("GEMINI_API_KEY",)
 client = genai.Client(api_key=API_KEY)
 
 # In-memory database to store chat histories
