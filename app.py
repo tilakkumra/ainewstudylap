@@ -8,11 +8,21 @@ from google.genai import types
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# --- FIXED API INITIALIZATION ---
-# The new SDK automatically looks for an environment variable named GEMINI_API_KEY.
-# If you must hardcode it temporarily, replace os.environ.get(...) with "AIzaSyYourNewKeyHere"
-API_KEY = os.environ.get("GEMINI_API_KEY",)
-client = genai.Client(api_key=API_KEY)
+# --- FORCE EXPLICIT API KEY INITIALIZATION ---
+# Pull the key from the environment variable safely
+RAW_KEY = os.environ.get("GEMINI_API_KEY")
+
+# Troubleshooting fallback: If your environment variable is failing to load locally,
+# uncomment the line below and paste your key directly to test if it fixes the 401:
+# RAW_KEY = "AIzaSyYourActualKeyHere"
+
+if not RAW_KEY:
+    print("❌ ERROR: GEMINI_API_KEY environment variable is completely empty!")
+
+# Passing it explicitly inside genai.Client(api_key=...) usually works, 
+# but if it fails with 401, this confirms your key string itself is invalid or revoked.
+client = genai.Client(api_key=RAW_KEY)
+# ---------------------------------------------
 
 # In-memory database to store chat histories
 chats_db = {}
@@ -89,7 +99,6 @@ def handle_message():
         "so the content is incredibly easy to read and glance through."
     )
 
-    # Adapt formatting slightly based on the selected mode button
     if mode_name == 'Summary':
         system_instruction += "\nFocus on building a beautiful, highly-structured Chapter Summary Article using bold subheadings and key takeaways."
     elif mode_name == 'Quiz':
@@ -106,7 +115,7 @@ def handle_message():
             contents=gemini_contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.75  # Slightly higher for more creative, engaging personality
+                temperature=0.75  
             )
         )
         ai_reply = response.text
