@@ -8,8 +8,11 @@ from google.genai import types
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# API Key baked right in - no terminal setup needed!
-client = genai.Client(api_key="AQ.Ab8RN6L77aZGUfEhW3a3sMCPr-NL_YnjtHnqxqSAeRicVzohzw")
+# --- FIXED API INITIALIZATION ---
+# The new SDK automatically looks for an environment variable named GEMINI_API_KEY.
+# If you must hardcode it temporarily, replace os.environ.get(...) with "AIzaSyYourNewKeyHere"
+API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyYourNewActualKeyHere")
+client = genai.Client(api_key=API_KEY)
 
 # In-memory database to store chat histories
 chats_db = {}
